@@ -55,9 +55,12 @@ async function loadKidsList() {
 
 // Add points or money to a kid
 async function addPointsMoney() {
+    console.log('addPointsMoney called');
     const kidName = document.getElementById('kid-select').value;
     const points = parseInt(document.getElementById('points-input').value) || 0;
     const money = parseFloat(document.getElementById('money-input').value) || 0;
+
+    console.log('Input values:', { kidName, points, money });
 
     if (points === 0 && money === 0) {
         alert('Please enter points or money to add');
@@ -66,8 +69,12 @@ async function addPointsMoney() {
 
     try {
         const data = await loadData();
+        console.log('Current data:', data);
+        
         if (data) {
             const kid = data.kids.find(k => k.name === kidName);
+            console.log('Found kid:', kid);
+            
             if (kid) {
                 kid.currentPoints += points;
                 kid.currentMoney += money;
@@ -81,9 +88,17 @@ async function addPointsMoney() {
                     interest: 0
                 });
 
+                console.log('Updated kid data:', kid);
+
                 // Save changes to Firebase
-                await saveData(data);
-                alert('Points and money added successfully!');
+                const success = await saveData(data);
+                console.log('Save to Firebase success:', success);
+                
+                if (success) {
+                    alert('Points and money added successfully!');
+                } else {
+                    alert('Failed to save changes. Please try again.');
+                }
                 
                 // Clear inputs
                 document.getElementById('points-input').value = '';
@@ -91,7 +106,7 @@ async function addPointsMoney() {
             }
         }
     } catch (error) {
-        console.error('Error adding points/money:', error);
+        console.error('Error in addPointsMoney:', error);
         alert('Error adding points/money. Please try again.');
     }
 }
@@ -124,12 +139,17 @@ async function calculateInterest() {
     }
 }
 
-// Add event listener for Enter key in password field
-document.getElementById('admin-password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        checkAdminPassword();
-    }
-});
-
-// Initialize data when page loads
-document.addEventListener('DOMContentLoaded', initializeData); 
+// Add event listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Admin login button
+    document.getElementById('admin-login-button').addEventListener('click', checkAdminPassword);
+    
+    // Add points/money button
+    document.getElementById('add-points-money-button').addEventListener('click', addPointsMoney);
+    
+    // Calculate interest button
+    document.getElementById('calculate-interest-button').addEventListener('click', calculateInterest);
+    
+    // Initialize data
+    initializeData();
+}); 
