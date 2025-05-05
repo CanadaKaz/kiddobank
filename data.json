@@ -1,0 +1,46 @@
+{
+    "kids": [
+        {
+            "name": "Kid 1",
+            "photo": "images/kid1.jpg",
+            "currentPoints": 0,
+            "currentMoney": 0,
+            "history": [
+                {
+                    "date": "2024-03-18",
+                    "points": 0,
+                    "money": 0,
+                    "interest": 0
+                }
+            ]
+        },
+        {
+            "name": "Kid 2",
+            "photo": "images/kid2.jpg",
+            "currentPoints": 0,
+            "currentMoney": 0,
+            "history": [
+                {
+                    "date": "2024-03-18",
+                    "points": 0,
+                    "money": 0,
+                    "interest": 0
+                }
+            ]
+        },
+        {
+            "name": "Kid 3",
+            "photo": "images/kid3.jpg",
+            "currentPoints": 0,
+            "currentMoney": 0,
+            "history": [
+                {
+                    "date": "2024-03-18",
+                    "points": 0,
+                    "money": 0,
+                    "interest": 0
+                }
+            ]
+        }
+    ]
+} 
