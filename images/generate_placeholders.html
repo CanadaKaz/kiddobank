@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Placeholder Images</title>
+    <style>
+        canvas {
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function generateImage(name, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, 300, 300);
+            
+            // Text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(name, 150, 150);
+            
+            // Download link
+            const link = document.createElement('a');
+            link.download = `${name.toLowerCase().replace(' ', '_')}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg');
+            link.textContent = `Download ${name}`;
+            link.style.display = 'block';
+            link.style.margin = '10px';
+            
+            document.body.appendChild(canvas);
+            document.body.appendChild(link);
+        }
+        
+        // Generate images for three kids
+        generateImage('Kid 1', '#4CAF50');
+        generateImage('Kid 2', '#2196F3');
+        generateImage('Kid 3', '#FF9800');
+    </script>
+</body>
+</html> 
