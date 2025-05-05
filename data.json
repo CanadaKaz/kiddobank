@@ -1,8 +1,8 @@
 {
     "kids": [
         {
-            "name": "Kid 1",
-            "photo": "images/kid1.jpg",
+            "name": "Jasper",
+            "photo": "images/jcn.png",
             "currentPoints": 0,
             "currentMoney": 0,
             "history": [
@@ -15,8 +15,8 @@
             ]
         },
         {
-            "name": "Kid 2",
-            "photo": "images/kid2.jpg",
+            "name": "Georgia",
+            "photo": "images/ggn.png",
             "currentPoints": 0,
             "currentMoney": 0,
             "history": [
@@ -29,8 +29,8 @@
             ]
         },
         {
-            "name": "Kid 3",
-            "photo": "images/kid3.jpg",
+            "name": "Juno",
+            "photo": "images/jgn.png",
             "currentPoints": 0,
             "currentMoney": 0,
             "history": [
