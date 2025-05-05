@@ -4,7 +4,14 @@ import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/fir
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    databaseURL: "https://kiddobank-cd88d.firebaseio.com"
+    apiKey: "AIzaSyCo6gpVofFfNaZknC9_spv_4bG_zyDY1sQ",
+    authDomain: "kiddobank-cd88d.firebaseapp.com",
+    databaseURL: "https://kiddobank-cd88d-default-rtdb.firebaseio.com",
+    projectId: "kiddobank-cd88d",
+    storageBucket: "kiddobank-cd88d.firebasestorage.app",
+    messagingSenderId: "641968445153",
+    appId: "1:641968445153:web:0ef41254a66517108d89a0",
+    measurementId: "G-Y130XQRCT2"
 };
 
 // Initialize Firebase
