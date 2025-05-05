@@ -1,38 +1,52 @@
+import { loadData, onDataUpdate } from './firebase.js';
+
 // Password for main page
 const MAIN_PASSWORD = "nejatian";
 
-// Initialize data from data.json if not already in localStorage
+// Initialize data from Firebase
 async function initializeData() {
     try {
-        // Always fetch fresh data from data.json
-        const response = await fetch('data.json?' + new Date().getTime());
-        const data = await response.json();
-        localStorage.setItem('kiddobank_data', JSON.stringify(data));
+        const data = await loadData();
+        if (!data) {
+            // If no data exists in Firebase, load initial data from data.json
+            const response = await fetch('data.json?' + new Date().getTime());
+            const initialData = await response.json();
+            await saveData(initialData);
+            return initialData;
+        }
+        return data;
     } catch (error) {
         console.error('Error initializing data:', error);
+        return null;
     }
 }
 
 // Check password and show main screen if correct
-function checkPassword() {
+async function checkPassword() {
     const passwordInput = document.getElementById('password');
     if (passwordInput.value === MAIN_PASSWORD) {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        loadKidsData();
-        // Set up periodic refresh
-        setInterval(loadKidsData, 5000); // Refresh every 5 seconds
+        await loadKidsData();
+        
+        // Set up real-time updates instead of periodic refresh
+        onDataUpdate((data) => {
+            if (data) {
+                displayKids(data.kids);
+            }
+        });
     } else {
         alert('Incorrect password!');
     }
 }
 
-// Load kids data from localStorage
+// Load kids data from Firebase
 async function loadKidsData() {
     try {
-        await initializeData(); // Always get fresh data
-        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        displayKids(data.kids);
+        const data = await initializeData();
+        if (data) {
+            displayKids(data.kids);
+        }
     } catch (error) {
         console.error('Error loading kids data:', error);
     }

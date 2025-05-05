@@ -1,13 +1,4 @@
-// Initialize data from data.json if not already in localStorage
-async function initializeData() {
-    try {
-        const response = await fetch('data.json?' + new Date().getTime());
-        const data = await response.json();
-        localStorage.setItem('kiddobank_data', JSON.stringify(data));
-    } catch (error) {
-        console.error('Error initializing data:', error);
-    }
-}
+import { loadData, onDataUpdate } from './firebase.js';
 
 // Get kid name from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
@@ -19,12 +10,12 @@ document.getElementById('kid-name').textContent = kidName;
 // Load and display kid's history
 async function loadKidHistory() {
     try {
-        await initializeData();
-        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        const kid = data.kids.find(k => k.name === kidName);
-        
-        if (kid) {
-            displayHistory(kid.history);
+        const data = await loadData();
+        if (data) {
+            const kid = data.kids.find(k => k.name === kidName);
+            if (kid) {
+                displayHistory(kid.history);
+            }
         }
     } catch (error) {
         console.error('Error loading kid data:', error);
@@ -59,6 +50,16 @@ function formatDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 }
+
+// Set up real-time updates
+onDataUpdate((data) => {
+    if (data) {
+        const kid = data.kids.find(k => k.name === kidName);
+        if (kid) {
+            displayHistory(kid.history);
+        }
+    }
+});
 
 // Initialize data and load history when page loads
 document.addEventListener('DOMContentLoaded', loadKidHistory); 

@@ -1,24 +1,33 @@
+import { loadData, saveData } from './firebase.js';
+
 // Admin password
 const ADMIN_PASSWORD = "Password";
 
-// Initialize data from data.json if not already in localStorage
+// Initialize data from Firebase
 async function initializeData() {
     try {
-        const response = await fetch('data.json?' + new Date().getTime());
-        const data = await response.json();
-        localStorage.setItem('kiddobank_data', JSON.stringify(data));
+        const data = await loadData();
+        if (!data) {
+            // If no data exists in Firebase, load initial data from data.json
+            const response = await fetch('data.json?' + new Date().getTime());
+            const initialData = await response.json();
+            await saveData(initialData);
+            return initialData;
+        }
+        return data;
     } catch (error) {
         console.error('Error initializing data:', error);
+        return null;
     }
 }
 
 // Check admin password
-function checkAdminPassword() {
+async function checkAdminPassword() {
     const passwordInput = document.getElementById('admin-password');
     if (passwordInput.value === ADMIN_PASSWORD) {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.remove('hidden');
-        loadKidsList();
+        await loadKidsList();
     } else {
         alert('Incorrect password!');
     }
@@ -27,17 +36,18 @@ function checkAdminPassword() {
 // Load kids list into dropdown
 async function loadKidsList() {
     try {
-        await initializeData();
-        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        const select = document.getElementById('kid-select');
-        select.innerHTML = ''; // Clear existing options
-        
-        data.kids.forEach(kid => {
-            const option = document.createElement('option');
-            option.value = kid.name;
-            option.textContent = kid.name;
-            select.appendChild(option);
-        });
+        const data = await initializeData();
+        if (data) {
+            const select = document.getElementById('kid-select');
+            select.innerHTML = ''; // Clear existing options
+            
+            data.kids.forEach(kid => {
+                const option = document.createElement('option');
+                option.value = kid.name;
+                option.textContent = kid.name;
+                select.appendChild(option);
+            });
+        }
     } catch (error) {
         console.error('Error loading kids list:', error);
     }
@@ -55,32 +65,29 @@ async function addPointsMoney() {
     }
 
     try {
-        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        const kid = data.kids.find(k => k.name === kidName);
-        if (kid) {
-            kid.currentPoints += points;
-            kid.currentMoney += money;
-            
-            // Add to history
-            const today = new Date('2025-05-05').toISOString().split('T')[0];
-            kid.history.push({
-                date: today,
-                points: kid.currentPoints,
-                money: kid.currentMoney,
-                interest: 0
-            });
+        const data = await loadData();
+        if (data) {
+            const kid = data.kids.find(k => k.name === kidName);
+            if (kid) {
+                kid.currentPoints += points;
+                kid.currentMoney += money;
+                
+                // Add to history
+                const today = new Date('2025-05-05').toISOString().split('T')[0];
+                kid.history.push({
+                    date: today,
+                    points: kid.currentPoints,
+                    money: kid.currentMoney,
+                    interest: 0
+                });
 
-            // Save changes
-            localStorage.setItem('kiddobank_data', JSON.stringify(data));
-            alert('Points and money added successfully!');
-            
-            // Clear inputs
-            document.getElementById('points-input').value = '';
-            document.getElementById('money-input').value = '';
-
-            // Refresh the dashboard if it's open
-            if (window.opener) {
-                window.opener.location.reload();
+                // Save changes to Firebase
+                await saveData(data);
+                alert('Points and money added successfully!');
+                
+                // Clear inputs
+                document.getElementById('points-input').value = '';
+                document.getElementById('money-input').value = '';
             }
         }
     } catch (error) {
@@ -92,27 +99,24 @@ async function addPointsMoney() {
 // Calculate interest for all kids
 async function calculateInterest() {
     try {
-        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        const today = new Date('2025-05-05').toISOString().split('T')[0];
-        
-        data.kids.forEach(kid => {
-            const interest = kid.currentMoney * 0.02; // 2% interest
-            kid.currentMoney += interest;
+        const data = await loadData();
+        if (data) {
+            const today = new Date('2025-05-05').toISOString().split('T')[0];
             
-            kid.history.push({
-                date: today,
-                points: kid.currentPoints,
-                money: kid.currentMoney,
-                interest: interest
+            data.kids.forEach(kid => {
+                const interest = kid.currentMoney * 0.02; // 2% interest
+                kid.currentMoney += interest;
+                
+                kid.history.push({
+                    date: today,
+                    points: kid.currentPoints,
+                    money: kid.currentMoney,
+                    interest: interest
+                });
             });
-        });
 
-        localStorage.setItem('kiddobank_data', JSON.stringify(data));
-        alert('Interest calculated and added successfully!');
-
-        // Refresh the dashboard if it's open
-        if (window.opener) {
-            window.opener.location.reload();
+            await saveData(data);
+            alert('Interest calculated and added successfully!');
         }
     } catch (error) {
         console.error('Error calculating interest:', error);
