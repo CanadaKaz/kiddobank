@@ -3,14 +3,12 @@ const ADMIN_PASSWORD = "Password";
 
 // Initialize data from data.json if not already in localStorage
 async function initializeData() {
-    if (!localStorage.getItem('kiddobank_data')) {
-        try {
-            const response = await fetch('data.json');
-            const data = await response.json();
-            localStorage.setItem('kiddobank_data', JSON.stringify(data));
-        } catch (error) {
-            console.error('Error initializing data:', error);
-        }
+    try {
+        const response = await fetch('data.json?' + new Date().getTime());
+        const data = await response.json();
+        localStorage.setItem('kiddobank_data', JSON.stringify(data));
+    } catch (error) {
+        console.error('Error initializing data:', error);
     }
 }
 
@@ -29,7 +27,7 @@ function checkAdminPassword() {
 // Load kids list into dropdown
 async function loadKidsList() {
     try {
-        await initializeData(); // Make sure data is initialized
+        await initializeData();
         const data = JSON.parse(localStorage.getItem('kiddobank_data'));
         const select = document.getElementById('kid-select');
         select.innerHTML = ''; // Clear existing options
@@ -64,7 +62,7 @@ async function addPointsMoney() {
             kid.currentMoney += money;
             
             // Add to history
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date('2025-05-05').toISOString().split('T')[0];
             kid.history.push({
                 date: today,
                 points: kid.currentPoints,
@@ -79,6 +77,11 @@ async function addPointsMoney() {
             // Clear inputs
             document.getElementById('points-input').value = '';
             document.getElementById('money-input').value = '';
+
+            // Refresh the dashboard if it's open
+            if (window.opener) {
+                window.opener.location.reload();
+            }
         }
     } catch (error) {
         console.error('Error adding points/money:', error);
@@ -90,7 +93,7 @@ async function addPointsMoney() {
 async function calculateInterest() {
     try {
         const data = JSON.parse(localStorage.getItem('kiddobank_data'));
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date('2025-05-05').toISOString().split('T')[0];
         
         data.kids.forEach(kid => {
             const interest = kid.currentMoney * 0.02; // 2% interest
@@ -106,6 +109,11 @@ async function calculateInterest() {
 
         localStorage.setItem('kiddobank_data', JSON.stringify(data));
         alert('Interest calculated and added successfully!');
+
+        // Refresh the dashboard if it's open
+        if (window.opener) {
+            window.opener.location.reload();
+        }
     } catch (error) {
         console.error('Error calculating interest:', error);
         alert('Error calculating interest. Please try again.');

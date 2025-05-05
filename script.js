@@ -3,14 +3,13 @@ const MAIN_PASSWORD = "nejatian";
 
 // Initialize data from data.json if not already in localStorage
 async function initializeData() {
-    if (!localStorage.getItem('kiddobank_data')) {
-        try {
-            const response = await fetch('data.json');
-            const data = await response.json();
-            localStorage.setItem('kiddobank_data', JSON.stringify(data));
-        } catch (error) {
-            console.error('Error initializing data:', error);
-        }
+    try {
+        // Always fetch fresh data from data.json
+        const response = await fetch('data.json?' + new Date().getTime());
+        const data = await response.json();
+        localStorage.setItem('kiddobank_data', JSON.stringify(data));
+    } catch (error) {
+        console.error('Error initializing data:', error);
     }
 }
 
@@ -21,6 +20,8 @@ function checkPassword() {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         loadKidsData();
+        // Set up periodic refresh
+        setInterval(loadKidsData, 5000); // Refresh every 5 seconds
     } else {
         alert('Incorrect password!');
     }
@@ -29,7 +30,7 @@ function checkPassword() {
 // Load kids data from localStorage
 async function loadKidsData() {
     try {
-        await initializeData(); // Make sure data is initialized
+        await initializeData(); // Always get fresh data
         const data = JSON.parse(localStorage.getItem('kiddobank_data'));
         displayKids(data.kids);
     } catch (error) {
