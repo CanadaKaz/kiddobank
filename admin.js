@@ -139,6 +139,11 @@ async function calculateInterest() {
     }
 }
 
+// Make functions available globally
+window.checkAdminPassword = checkAdminPassword;
+window.addPointsMoney = addPointsMoney;
+window.calculateInterest = calculateInterest;
+
 // Add event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Admin login button
