@@ -1,3 +1,16 @@
+// Initialize data from data.json if not already in localStorage
+async function initializeData() {
+    if (!localStorage.getItem('kiddobank_data')) {
+        try {
+            const response = await fetch('data.json');
+            const data = await response.json();
+            localStorage.setItem('kiddobank_data', JSON.stringify(data));
+        } catch (error) {
+            console.error('Error initializing data:', error);
+        }
+    }
+}
+
 // Get kid name from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
 const kidName = urlParams.get('name');
@@ -8,8 +21,8 @@ document.getElementById('kid-name').textContent = kidName;
 // Load and display kid's history
 async function loadKidHistory() {
     try {
-        const response = await fetch('data.json');
-        const data = await response.json();
+        await initializeData(); // Make sure data is initialized
+        const data = JSON.parse(localStorage.getItem('kiddobank_data'));
         const kid = data.kids.find(k => k.name === kidName);
         
         if (kid) {
@@ -48,5 +61,5 @@ function formatDate(dateString) {
     return date.toLocaleDateString('en-US');
 }
 
-// Load history when page loads
+// Initialize data and load history when page loads
 document.addEventListener('DOMContentLoaded', loadKidHistory); 
